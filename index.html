@@ -3,24 +3,29 @@
   <head>
     <title>Discord Auth Callback</title>
     <script>
-      window.onload = function() {
+      let sent = false;
+      function sendCode() {
+        if (sent) return;
+        sent = true;
         const params = new URLSearchParams(window.location.search);
         const code = params.get('code');
         if (code) {
           fetch('http://localhost:5173/auth/callback?code=' + encodeURIComponent(code))
             .then(() => {
-              document.body.innerHTML += '<p>Authentification envoyée à l’application ! Vous pouvez fermer cette fenêtre.</p>';
+              document.body.innerHTML += '<p>Authentication sent to the app! You may close this window.</p>';
               setTimeout(() => window.close(), 1000);
             })
             .catch(() => {
-              document.body.innerHTML += '<p>Impossible de contacter l’application. Relancez-la si besoin.</p>';
+              document.body.innerHTML += '<p>Could not contact the app. Please restart it if needed.</p>';
             });
         }
       }
+      window.onload = sendCode;
+      document.addEventListener('DOMContentLoaded', sendCode);
     </script>
   </head>
   <body>
-    <h2>Authentification Discord réussie</h2>
-    <p>Vous pouvez fermer cette fenêtre.</p>
+    <h2>Discord authentication successful</h2>
+    <p>You may close this window.</p>
   </body>
 </html>
