@@ -2,21 +2,25 @@
 <html>
   <head>
     <title>Discord Auth Callback</title>
+    <script>
+      window.onload = function() {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code');
+        if (code) {
+          fetch('http://localhost:5173/auth/callback?code=' + encodeURIComponent(code))
+            .then(() => {
+              document.body.innerHTML += '<p>Authentification envoyée à l’application ! Vous pouvez fermer cette fenêtre.</p>';
+              setTimeout(() => window.close(), 1000);
+            })
+            .catch(() => {
+              document.body.innerHTML += '<p>Impossible de contacter l’application. Relancez-la si besoin.</p>';
+            });
+        }
+      }
+    </script>
   </head>
   <body>
     <h2>Authentification Discord réussie</h2>
-    <p>Vous pouvez fermer cette fenêtre et retourner dans l'application.</p>
-    <script>
-      const params = new URLSearchParams(window.location.search);
-      const code = params.get('code');
-      if (code) {
-        const btn = document.createElement('button');
-        btn.textContent = 'Retourner à l’application';
-        btn.onclick = () => {
-          window.location.href = `archerage://auth?code=${code}`;
-        };
-        document.body.appendChild(btn);
-      }
-    </script>
+    <p>Vous pouvez fermer cette fenêtre.</p>
   </body>
 </html>
