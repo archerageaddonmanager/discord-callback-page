@@ -110,7 +110,7 @@
             const code = params.get('code');
             
             if (code) {
-                fetch('http://localhost:9002/api/auth/callback?code=' + encodeURIComponent(code))
+                fetch('http://localhost:5173/auth/callback?code=' + encodeURIComponent(code))
                     .then(() => {
                         hideSpinner();
                         updateTitle('Authentication Successful!');
