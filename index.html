@@ -85,6 +85,23 @@
             document.getElementById('subtitle').textContent = subtitle;
         }
         
+        function closeWindow() {
+            try {
+                window.close();
+                
+                if (!window.closed) {
+                    self.close();
+                }
+                
+                if (!window.closed) {
+                    window.location.href = 'about:blank';
+                }
+            } catch (e) {
+                console.log('Unable to close window automatically');
+                showMessage('Please close this window manually.', 'success');
+            }
+        }
+        
         function sendCode() {
             if (sent) return;
             sent = true;
@@ -99,21 +116,21 @@
                         updateTitle('Authentication Successful!');
                         updateSubtitle('You may close this window.');
                         showMessage('Authentication sent to the app! This window will close automatically.', 'success');
-                        setTimeout(() => window.close(), 2000);
+                        setTimeout(closeWindow, 2000);
                     })
                     .catch(() => {
                         hideSpinner();
                         updateTitle('Authentication Error');
                         updateSubtitle('Could not contact the app.');
                         showMessage('Could not contact the app. Please restart it if needed.', 'error');
-                        setTimeout(() => window.close(), 3000);
+                        setTimeout(closeWindow, 3000);
                     });
             } else {
                 hideSpinner();
                 updateTitle('Authentication Error');
                 updateSubtitle('Authentication code missing.');
                 showMessage('No authentication code found in URL.', 'error');
-                setTimeout(() => window.close(), 3000);
+                setTimeout(closeWindow, 3000);
             }
         }
         
