@@ -59,8 +59,8 @@
 <body>
     <div class="container">
         <div class="spinner" id="spinner"></div>
-        <h2 id="title">Authentification Discord</h2>
-        <p id="subtitle">Authentification en cours...</p>
+        <h2 id="title">Discord Authentication</h2>
+        <p id="subtitle">Authentication in progress...</p>
         <div id="message"></div>
     </div>
     
@@ -96,22 +96,24 @@
                 fetch('http://localhost:5173/auth/callback?code=' + encodeURIComponent(code))
                     .then(() => {
                         hideSpinner();
-                        updateTitle('Authentification réussie!');
-                        updateSubtitle('Vous pouvez fermer cette fenêtre.');
-                        showMessage('Authentification envoyée à l\'application! Cette fenêtre se fermera automatiquement.', 'success');
+                        updateTitle('Authentication Successful!');
+                        updateSubtitle('You may close this window.');
+                        showMessage('Authentication sent to the app! This window will close automatically.', 'success');
                         setTimeout(() => window.close(), 2000);
                     })
                     .catch(() => {
                         hideSpinner();
-                        updateTitle('Erreur d\'authentification');
-                        updateSubtitle('Impossible de contacter l\'application.');
-                        showMessage('Impossible de contacter l\'application. Veuillez la redémarrer si nécessaire.', 'error');
+                        updateTitle('Authentication Error');
+                        updateSubtitle('Could not contact the app.');
+                        showMessage('Could not contact the app. Please restart it if needed.', 'error');
+                        setTimeout(() => window.close(), 3000);
                     });
             } else {
                 hideSpinner();
-                updateTitle('Erreur d\'authentification');
-                updateSubtitle('Code d\'authentification manquant.');
-                showMessage('Aucun code d\'authentification trouvé dans l\'URL.', 'error');
+                updateTitle('Authentication Error');
+                updateSubtitle('Authentication code missing.');
+                showMessage('No authentication code found in URL.', 'error');
+                setTimeout(() => window.close(), 3000);
             }
         }
         
