@@ -1,31 +1,124 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Discord Auth Callback</title>
-    <script>
-      let sent = false;
-      function sendCode() {
-        if (sent) return;
-        sent = true;
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get('code');
-        if (code) {
-          fetch('http://localhost:5173/auth/callback?code=' + encodeURIComponent(code))
-            .then(() => {
-              document.body.innerHTML += '<p>Authentication sent to the app! You may close this window.</p>';
-              setTimeout(() => window.close(), 1000);
-            })
-            .catch(() => {
-              document.body.innerHTML += '<p>Could not contact the app. Please restart it if needed.</p>';
-            });
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentification Discord</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: white;
         }
-      }
-      window.onload = sendCode;
-      document.addEventListener('DOMContentLoaded', sendCode);
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .success {
+            color: #51cf66;
+            background: rgba(81, 207, 102, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <h2>Authentification en cours...</h2>
+        <p>Veuillez patienter pendant que nous finalisons votre connexion.</p>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        function getUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                code: params.get('code'),
+                state: params.get('state'),
+                error: params.get('error'),
+                error_description: params.get('error_description')
+            };
+        }
+
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = type;
+            messageDiv.textContent = message;
+        }
+
+        function closeWindow() {
+            setTimeout(() => {
+                window.close();
+            }, 2000);
+        }
+
+        const params = getUrlParams();
+
+        if (params.error) {
+            showMessage(`Erreur d'authentification: ${params.error_description || params.error}`, 'error');
+            
+            if (window.opener) {
+                try {
+                    window.opener.postMessage({
+                        error: params.error_description || params.error
+                    }, 'http://localhost:5173');
+                } catch (e) {
+                    console.error('Erreur lors de l\'envoi du message:', e);
+                }
+            }
+            
+            closeWindow();
+        } else if (params.code && params.state) {
+            showMessage('Authentification réussie! Redirection en cours...', 'success');
+            
+            if (window.opener) {
+                try {
+                    window.opener.postMessage({
+                        code: params.code,
+                        state: params.state
+                    }, 'http://localhost:5173');
+                } catch (e) {
+                    console.error('Erreur lors de l\'envoi du message:', e);
+                }
+            }
+            
+            closeWindow();
+        } else {
+            showMessage('Paramètres d\'authentification manquants', 'error');
+            closeWindow();
+        }
     </script>
-  </head>
-  <body>
-    <h2>Discord authentication successful</h2>
-    <p>You may close this window.</p>
-  </body>
+</body>
 </html>
